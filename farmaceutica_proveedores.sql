@@ -28,6 +28,7 @@ CREATE TABLE `proveedores` (
   `direccion` varchar(45) NOT NULL,
   `telefono` varchar(45) NOT NULL,
   `correo` varchar(45) NOT NULL,
+  `NIT` varchar(45) NOT NULL,
   PRIMARY KEY (`proveedor_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;

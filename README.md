@@ -1,61 +1,224 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Sistema Farmacéutico - Laravel
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Sistema completo de gestión farmacéutica desarrollado con Laravel 12, que incluye gestión de productos, compras, ventas, clientes, proveedores, empleados y alertas automáticas.
 
-## About Laravel
+## 🚀 Características
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- **Gestión de Productos**: CRUD completo con control de stock y fechas de vencimiento
+- **Sistema de Compras**: Registro de compras con actualización automática de stock
+- **Sistema de Ventas**: Registro de ventas con verificación de stock
+- **Gestión de Clientes**: Base de datos de clientes
+- **Gestión de Proveedores**: Base de datos de proveedores
+- **Gestión de Empleados**: Base de datos de empleados
+- **Sistema de Alertas**: Alertas automáticas por bajo stock y vencimiento
+- **Historial de Stock**: Seguimiento completo de movimientos de inventario
+- **Triggers Automáticos**: Actualización automática de stock y generación de alertas
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## 📋 Requisitos
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- PHP 8.2 o superior
+- Composer
+- XAMPP (Apache + MySQL)
+- Laravel 12
 
-## Learning Laravel
+## 🛠️ Instalación
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### 1. Configurar XAMPP
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+1. Iniciar XAMPP
+2. Activar Apache y MySQL
+3. Acceder a phpMyAdmin (http://localhost/phpmyadmin)
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### 2. Configurar Base de Datos
 
-## Laravel Sponsors
+1. Ejecutar el archivo `database_setup.sql` en phpMyAdmin
+2. Ejecutar el archivo `triggers.sql` en phpMyAdmin
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### 3. Configurar Laravel
 
-### Premium Partners
+1. **Configurar archivo .env**:
+```env
+APP_NAME="Sistema Farmacéutico"
+APP_ENV=local
+APP_KEY=base64:your-app-key-here
+APP_DEBUG=true
+APP_URL=http://localhost:8000
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=farmaceutica
+DB_USERNAME=root
+DB_PASSWORD=
+```
 
-## Contributing
+2. **Generar clave de aplicación**:
+```bash
+php artisan key:generate
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+3. **Instalar dependencias**:
+```bash
+composer install
+```
 
-## Code of Conduct
+4. **Ejecutar el servidor**:
+```bash
+php artisan serve
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+5. **Acceder al sistema**:
+   - URL: http://localhost:8000
+   - Dashboard principal con acceso a todas las funcionalidades
 
-## Security Vulnerabilities
+## 📁 Estructura del Proyecto
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```
+app/
+├── Models/
+│   ├── Producto.php
+│   ├── Compra.php
+│   ├── Venta.php
+│   ├── Cliente.php
+│   ├── Proveedor.php
+│   ├── Empleado.php
+│   ├── Categoria.php
+│   ├── Alerta.php
+│   └── HistorialStock.php
+└── Http/Controllers/
+    ├── ProductoController.php
+    ├── CompraController.php
+    ├── VentaController.php
+    ├── ClienteController.php
+    ├── ProveedorController.php
+    ├── EmpleadoController.php
+    ├── CategoriaController.php
+    ├── AlertaController.php
+    └── HistorialStockController.php
 
-## License
+routes/
+└── web.php
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+resources/views/
+└── dashboard.blade.php
+```
+
+## 🔧 Funcionalidades Principales
+
+### Productos
+- ✅ Crear, leer, actualizar y eliminar productos
+- ✅ Control de stock automático
+- ✅ Alertas por bajo stock
+- ✅ Alertas por vencimiento próximo
+- ✅ Historial de movimientos
+
+### Compras
+- ✅ Registro de compras
+- ✅ Actualización automática de stock
+- ✅ Cálculo automático de totales
+- ✅ Historial de compras
+
+### Ventas
+- ✅ Registro de ventas
+- ✅ Verificación de stock antes de vender
+- ✅ Reducción automática de stock
+- ✅ Cálculo automático de totales
+- ✅ Historial de ventas
+
+### Alertas
+- ✅ Alertas automáticas por bajo stock
+- ✅ Alertas automáticas por vencimiento
+- ✅ Gestión de estado de alertas
+- ✅ Filtros por tipo de alerta
+
+## 🎯 Triggers Implementados
+
+1. **`trg_actualizar_stock_compra`**: Actualiza stock al hacer compras
+2. **`trg_actualizar_stock_venta`**: Reduce stock al hacer ventas
+3. **`trg_alerta_vencimiento`**: Crea alertas de vencimiento
+4. **`trg_prevenir_venta_si_sin_stock`**: Previene ventas sin stock
+
+## 📊 Rutas Disponibles
+
+### Productos
+- `GET /productos` - Lista de productos
+- `GET /productos/create` - Formulario de nuevo producto
+- `POST /productos` - Crear producto
+- `GET /productos/{id}` - Ver producto
+- `GET /productos/{id}/edit` - Formulario de edición
+- `PUT /productos/{id}` - Actualizar producto
+- `DELETE /productos/{id}` - Eliminar producto
+- `GET /productos/bajo-stock` - Productos con bajo stock
+- `GET /productos/por-vencer` - Productos por vencer
+
+### Compras
+- `GET /compras` - Lista de compras
+- `GET /compras/create` - Formulario de nueva compra
+- `POST /compras` - Crear compra
+- `GET /compras/{id}` - Ver compra
+- `GET /compras/{id}/edit` - Formulario de edición
+- `PUT /compras/{id}` - Actualizar compra
+- `DELETE /compras/{id}` - Eliminar compra
+
+### Ventas
+- `GET /ventas` - Lista de ventas
+- `GET /ventas/create` - Formulario de nueva venta
+- `POST /ventas` - Crear venta
+- `GET /ventas/{id}` - Ver venta
+- `GET /ventas/{id}/edit` - Formulario de edición
+- `PUT /ventas/{id}` - Actualizar venta
+- `DELETE /ventas/{id}` - Eliminar venta
+
+### Otras Entidades
+- `GET /clientes` - Gestión de clientes
+- `GET /proveedores` - Gestión de proveedores
+- `GET /empleados` - Gestión de empleados
+- `GET /categorias` - Gestión de categorías
+- `GET /alertas` - Gestión de alertas
+- `GET /historial-stock` - Historial de stock
+
+## 🎨 Interfaz de Usuario
+
+- **Dashboard Principal**: Vista general del sistema
+- **Navegación Intuitiva**: Menú lateral con acceso a todas las funcionalidades
+- **Tarjetas de Resumen**: Información rápida de cada módulo
+- **Acciones Rápidas**: Botones para crear nuevos registros
+- **Reportes Rápidos**: Acceso directo a reportes importantes
+
+## 🔍 Características Técnicas
+
+- **Laravel 12**: Framework PHP moderno
+- **MySQL**: Base de datos robusta
+- **Triggers**: Automatización de procesos
+- **Validaciones**: Validación completa de datos
+- **Relaciones**: Modelos con relaciones bien definidas
+- **Scopes**: Consultas optimizadas
+- **Transacciones**: Operaciones seguras
+
+## 📝 Notas Importantes
+
+1. **Triggers**: Los triggers están configurados para funcionar automáticamente
+2. **Stock**: El stock se actualiza automáticamente con cada compra/venta
+3. **Alertas**: Las alertas se generan automáticamente según los triggers
+4. **Validaciones**: Todas las operaciones tienen validaciones completas
+5. **Transacciones**: Las operaciones críticas usan transacciones de base de datos
+
+## 🚀 Próximos Pasos
+
+1. **Vistas**: Crear las vistas Blade para cada funcionalidad
+2. **Autenticación**: Implementar sistema de login
+3. **Reportes**: Crear reportes avanzados
+4. **API**: Crear API REST para integraciones
+5. **Testing**: Implementar pruebas unitarias
+
+## 📞 Soporte
+
+Para cualquier duda o problema, revisar:
+1. Los logs de Laravel en `storage/logs/`
+2. Los logs de MySQL en XAMPP
+3. La configuración de la base de datos
+4. Los triggers en phpMyAdmin
+
+---
+
+**¡Sistema Farmacéutico listo para usar! 🎉**
