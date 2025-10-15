@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Carbon\Carbon;
+use App\Models\HistorialStock;
 
 class Venta extends Model
 {
@@ -41,6 +43,24 @@ class Venta extends Model
     public function detalleVentas(): HasMany
     {
         return $this->hasMany(DetalleVenta::class, 'venta_id');
+    }
+
+    public function historialStock(): HasMany
+    {
+        return $this->hasMany(HistorialStock::class, 'venta_id');
+    }
+
+    public function createdAtFromHistorial(): ?Carbon
+    {
+        $h = $this->historialStock()->orderBy('fecha')->first();
+        return $h ? Carbon::parse($h->fecha) : null;
+    }
+
+    public function isEditable(int $minutes = 60): bool
+    {
+        $created = $this->createdAtFromHistorial();
+        if (! $created) return true;
+        return $created->diffInMinutes(Carbon::now()) <= $minutes;
     }
 
     // Métodos auxiliares

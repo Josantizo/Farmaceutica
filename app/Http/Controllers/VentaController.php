@@ -21,7 +21,7 @@ class VentaController extends Controller
      */
     public function index(): View
     {
-        $ventas = Venta::with(['cliente', 'empleado', 'detalleVentas'])
+        $ventas = Venta::with(['cliente', 'empleado', 'detalleVentas.producto', 'historialStock'])
             ->orderBy('fecha_venta', 'desc')
             ->paginate(15);
 
@@ -146,7 +146,7 @@ class VentaController extends Controller
      */
     public function show(Venta $venta): View
     {
-        $venta->load(['cliente', 'empleado', 'detalleVentas.producto']);
+        $venta->load(['cliente', 'empleado', 'detalleVentas.producto', 'historialStock']);
 
         return view('ventas.show', compact('venta'));
     }
@@ -160,7 +160,7 @@ class VentaController extends Controller
         $empleados = Empleado::orderBy('nombre')->get();
         $productos = Producto::conStock()->orderBy('nombre')->get();
 
-        $venta->load('detalleVentas');
+    $venta->load('detalleVentas.producto', 'historialStock');
 
         return view('ventas.edit', compact('venta', 'clientes', 'empleados', 'productos'));
     }
@@ -240,10 +240,36 @@ class VentaController extends Controller
         DB::beginTransaction();
 
         try {
-            // Eliminar detalles de venta (esto activará los triggers)
+            // Evitar eliminación fuera de la ventana de edición (60 minutos) basada en historial
+            $venta->load('historialStock', 'detalleVentas');
+            if (! $venta->isEditable(60)) {
+                return redirect()->route('ventas.index')
+                    ->with('error', 'No se puede eliminar la venta porque pasó más de 1 hora desde su ingreso.');
+            }
+
+            // Revertir stock: sumar la cantidad que se había restado al crear la venta
+            foreach ($venta->detalleVentas as $detalle) {
+                $producto = Producto::lockForUpdate()->find($detalle->producto_id);
+                if ($producto) {
+                    $producto->update([
+                        'stock_actual' => $producto->stock_actual + (int)$detalle->cantidad
+                    ]);
+
+                    // Registrar en historial una entrada de ajuste (entrada) indicando reversión
+                    HistorialStock::create([
+                        'producto_id' => $producto->producto_id,
+                        'fecha' => now(),
+                        'cantidad_cambio' => (int)$detalle->cantidad,
+                        'tipo_movimiento' => 'Ajuste',
+                        'compra_id' => null,
+                        'venta_id' => $venta->ventas_id,
+                        'liquidacion_id' => null,
+                    ]);
+                }
+            }
+
+            // Eliminar detalles y la venta
             $venta->detalleVentas()->delete();
-            
-            // Eliminar la venta
             $venta->delete();
 
             DB::commit();

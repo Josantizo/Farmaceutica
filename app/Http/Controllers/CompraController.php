@@ -21,7 +21,7 @@ class CompraController extends Controller
      */
     public function index(): View
     {
-        $compras = Compra::with(['proveedor', 'empleado', 'detalleCompras'])
+        $compras = Compra::with(['proveedor', 'empleado', 'detalleCompras.producto', 'historialStock'])
             ->orderBy('fecha_compra', 'desc')
             ->paginate(15);
 
@@ -118,7 +118,7 @@ class CompraController extends Controller
      */
     public function show(Compra $compra): View
     {
-        $compra->load(['proveedor', 'empleado', 'detalleCompras.producto']);
+        $compra->load(['proveedor', 'empleado', 'detalleCompras.producto', 'historialStock']);
 
         return view('compras.show', compact('compra'));
     }
@@ -132,7 +132,7 @@ class CompraController extends Controller
         $empleados = Empleado::orderBy('nombre')->get();
         $productos = Producto::orderBy('nombre')->get();
 
-        $compra->load('detalleCompras');
+    $compra->load('detalleCompras.producto', 'historialStock');
 
         return view('compras.edit', compact('compra', 'proveedores', 'empleados', 'productos'));
     }
@@ -204,10 +204,37 @@ class CompraController extends Controller
         DB::beginTransaction();
 
         try {
-            // Eliminar detalles de compra (esto activará los triggers)
+            // No permitir eliminación fuera de la ventana de 60 minutos basada en historial
+            $compra->load('historialStock', 'detalleCompras');
+            if (! $compra->isEditable(60)) {
+                return redirect()->route('compras.index')
+                    ->with('error', 'No se puede eliminar la compra porque pasó más de 1 hora desde su ingreso.');
+            }
+
+            // Revertir stock: restar las cantidades ingresadas por esta compra
+            foreach ($compra->detalleCompras as $detalle) {
+                $producto = Producto::lockForUpdate()->find($detalle->producto_id);
+                if ($producto) {
+                    // Restar la cantidad que se había sumado al crear la compra
+                    $producto->update([
+                        'stock_actual' => max(0, $producto->stock_actual - (int)$detalle->cantidad)
+                    ]);
+
+                    // Registrar en historial una entrada de ajuste (salida) indicando reversión
+                    HistorialStock::create([
+                        'producto_id' => $producto->producto_id,
+                        'fecha' => now(),
+                        'cantidad_cambio' => -(int)$detalle->cantidad,
+                        'tipo_movimiento' => 'Ajuste',
+                        'compra_id' => $compra->compra_id,
+                        'venta_id' => null,
+                        'liquidacion_id' => null,
+                    ]);
+                }
+            }
+
+            // Eliminar detalles de compra y la compra
             $compra->detalleCompras()->delete();
-            
-            // Eliminar la compra
             $compra->delete();
 
             DB::commit();

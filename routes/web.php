@@ -57,6 +57,8 @@ Route::get('alertas/tipo/{tipo}', [AlertaController::class, 'porTipo'])->name('a
 Route::patch('alertas/{alerta}/resolver', [AlertaController::class, 'resolver'])->name('alertas.resolver');
 Route::patch('alertas/{alerta}/pendiente', [AlertaController::class, 'pendiente'])->name('alertas.pendiente');
 Route::delete('alertas/{alerta}', [AlertaController::class, 'destroy'])->name('alertas.destroy');
+// Crear alerta de tipo 'por_vencer' y redirigir a crear liquidación
+Route::post('alertas/por-vencer', [AlertaController::class, 'crearPorVencer'])->name('alertas.por-vencer.crear');
 
 // Rutas para Historial de Stock
 Route::get('historial-stock', [HistorialStockController::class, 'index'])->name('historial-stock.index');

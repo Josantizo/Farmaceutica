@@ -45,13 +45,20 @@
                     <td>{{ optional($venta->cliente)->nombre }}</td>
                     <td>{{ optional($venta->empleado)->nombre }}</td>
                     <td>{{ number_format($venta->total, 2) }}</td>
+                    <td>
+                        @php
+                            $prodNames = $venta->detalleVentas->pluck('producto.nombre')->filter()->unique()->values();
+                        @endphp
+                        <small>{{ $prodNames->join(', ') ?: '—' }}</small>
+                    </td>
                     <td class="text-end">
+                        @php $editable = method_exists($venta, 'isEditable') ? $venta->isEditable(60) : true; @endphp
                         <a class="btn btn-sm btn-secondary" href="{{ route('ventas.show', $venta) }}">Ver</a>
-                        <a class="btn btn-sm btn-warning" href="{{ route('ventas.edit', $venta) }}">Editar</a>
+                        <a class="btn btn-sm btn-warning {{ $editable ? '' : 'disabled' }}" href="{{ $editable ? route('ventas.edit', $venta) : '#' }}" aria-disabled="{{ $editable ? 'false' : 'true' }}">Editar</a>
                         <form action="{{ route('ventas.destroy', $venta) }}" method="POST" class="d-inline" onsubmit="return confirm('¿Eliminar venta?');">
                             @csrf
                             @method('DELETE')
-                            <button class="btn btn-sm btn-danger" type="submit">Eliminar</button>
+                            <button class="btn btn-sm btn-danger" type="submit" {{ $editable ? '' : 'disabled' }}>Eliminar</button>
                         </form>
                     </td>
                 </tr>

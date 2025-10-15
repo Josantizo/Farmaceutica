@@ -26,17 +26,23 @@ class LiquidacionController extends Controller
         $proveedores = Proveedor::orderBy('nombre')->get();
 
         $proveedorId = $request->input('proveedor_id');
+        $productoId = $request->input('producto_id');
         $sugeridos = collect();
         $proveedorSeleccionado = null;
 
         if ($proveedorId) {
             $proveedorSeleccionado = Proveedor::with('politica')->findOrFail($proveedorId);
             $dias = optional($proveedorSeleccionado->politica)->dias_anticipacion ?? 30;
-            $sugeridos = Producto::where('proveedor_id', $proveedorId)
+            $query = Producto::where('proveedor_id', $proveedorId)
                 ->where('stock_actual', '>', 0)
                 ->whereDate('fecha_vencimiento', '<=', now()->addDays($dias))
-                ->orderBy('fecha_vencimiento')
-                ->get();
+                ->orderBy('fecha_vencimiento');
+
+            if ($productoId) {
+                $query->where('producto_id', $productoId);
+            }
+
+            $sugeridos = $query->get();
         }
 
         return view('liquidaciones.create', compact('proveedores', 'sugeridos', 'proveedorSeleccionado'));

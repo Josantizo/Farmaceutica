@@ -79,4 +79,30 @@ class AlertaController extends Controller
         return redirect()->route('alertas.index')
             ->with('success', 'Alerta eliminada exitosamente.');
     }
+
+    /**
+     * Crear una alerta por vencimiento para un producto y redirigir
+     * al formulario de creación de liquidación con proveedor/producto preseleccionados.
+     */
+    public function crearPorVencer(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'producto_id' => 'required|exists:productos,producto_id'
+        ]);
+
+        $producto = \App\Models\Producto::with('proveedor')->findOrFail($request->producto_id);
+
+        $alerta = Alerta::create([
+            'producto_id' => $producto->producto_id,
+            'tipo_alerta' => 'por_vencer',
+            'fecha_generada' => now()->toDateString(),
+            'estado' => 'pendiente',
+        ]);
+
+        // Redirigir al formulario de creación de liquidación con proveedor_id y producto_id
+        return redirect()->route('liquidaciones.create', [
+            'proveedor_id' => $producto->proveedor_id,
+            'producto_id' => $producto->producto_id,
+        ])->with('success', 'Alerta creada y se abrirá el formulario de liquidación.');
+    }
 }

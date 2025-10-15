@@ -39,22 +39,30 @@
             </thead>
             <tbody>
             @forelse($compras as $compra)
-                <tr>
-                    <td>{{ $compra->compra_id }}</td>
-                    <td>{{ \Carbon\Carbon::parse($compra->fecha_compra)->format('Y-m-d') }}</td>
-                    <td>{{ optional($compra->proveedor)->nombre }}</td>
-                    <td>{{ optional($compra->empleado)->nombre }}</td>
-                    <td>{{ number_format($compra->total, 2) }}</td>
-                    <td class="text-end">
-                        <a class="btn btn-sm btn-secondary" href="{{ route('compras.show', $compra) }}">Ver</a>
-                        <a class="btn btn-sm btn-warning" href="{{ route('compras.edit', $compra) }}">Editar</a>
-                        <form action="{{ route('compras.destroy', $compra) }}" method="POST" class="d-inline" onsubmit="return confirm('¿Eliminar compra?');">
-                            @csrf
-                            @method('DELETE')
-                            <button class="btn btn-sm btn-danger" type="submit">Eliminar</button>
-                        </form>
-                    </td>
-                </tr>
+                    <tr>
+                        <td>{{ $compra->compra_id }}</td>
+                        <td>{{ \Carbon\Carbon::parse($compra->fecha_compra)->format('Y-m-d') }}</td>
+                        <td>{{ optional($compra->proveedor)->nombre }}</td>
+                        <td>{{ optional($compra->empleado)->nombre }}</td>
+                        <td>{{ number_format($compra->total, 2) }}</td>
+                        <td>
+                            {{-- Mostrar una lista corta de productos comprados (nombres separados por coma) --}}
+                            @php
+                                $prodNames = $compra->detalleCompras->pluck('producto.nombre')->filter()->unique()->values();
+                            @endphp
+                            <small>{{ $prodNames->join(', ') ?: '—' }}</small>
+                        </td>
+                        <td class="text-end">
+                            @php $editable = method_exists($compra, 'isEditable') ? $compra->isEditable(60) : true; @endphp
+                            <a class="btn btn-sm btn-secondary" href="{{ route('compras.show', $compra) }}">Ver</a>
+                            <a class="btn btn-sm btn-warning {{ $editable ? '' : 'disabled' }}" href="{{ $editable ? route('compras.edit', $compra) : '#' }}" aria-disabled="{{ $editable ? 'false' : 'true' }}">Editar</a>
+                            <form action="{{ route('compras.destroy', $compra) }}" method="POST" class="d-inline" onsubmit="return confirm('¿Eliminar compra?');">
+                                @csrf
+                                @method('DELETE')
+                                <button class="btn btn-sm btn-danger" type="submit" {{ $editable ? '' : 'disabled' }}>Eliminar</button>
+                            </form>
+                        </td>
+                    </tr>
             @empty
                 <tr>
                     <td colspan="6" class="text-center">No hay compras registradas.</td>
