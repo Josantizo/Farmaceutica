@@ -64,6 +64,7 @@ Route::post('alertas/por-vencer', [AlertaController::class, 'crearPorVencer'])->
 Route::get('historial-stock', [HistorialStockController::class, 'index'])->name('historial-stock.index');
 Route::get('historial-stock/producto/{productoId}', [HistorialStockController::class, 'porProducto'])->name('historial-stock.por-producto');
 Route::get('historial-stock/tipo/{tipo}', [HistorialStockController::class, 'porTipo'])->name('historial-stock.por-tipo');
+Route::post('historial-stock/exportar', [HistorialStockController::class, 'exportar'])->name('historial-stock.exportar');
 
 // Rutas para Liquidaciones (solo Admin)
 Route::resource('liquidaciones', LiquidacionController::class)->middleware('admin');
